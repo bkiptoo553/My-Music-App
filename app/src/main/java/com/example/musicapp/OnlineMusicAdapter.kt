@@ -13,7 +13,8 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 
-class OnlineMusicAdapter(private val context: Context): RecyclerView.Adapter<OnlineMusicAdapter.MyViewHolder>() {
+class OnlineMusicAdapter(private val context: Context):
+    RecyclerView.Adapter<OnlineMusicAdapter.MyViewHolder>() {
     class MyViewHolder(itemView:View): RecyclerView.ViewHolder(itemView){
 
 
@@ -37,14 +38,14 @@ class OnlineMusicAdapter(private val context: Context): RecyclerView.Adapter<Onl
         fun bind(position: Int, context: Context) {
 
             playButton.setOnClickListener{
-                Log.i(tag, "Play button clicked!")
+                Log.i(tag, "Play button clicked!@$position")
                 val intent = Intent(context, OnlineMusicAdapter::class.java)
                 startActivity(context, intent, null)
 
             }
 
             moreButton.setOnClickListener {
-                Log.i(tag, "more or info Button Clicked!")
+                Log.i(tag, "more or info Button Clicked!@$position")
             }
 
         }
