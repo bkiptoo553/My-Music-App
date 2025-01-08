@@ -10,6 +10,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 const val tag = "MainActivity"
 
@@ -31,6 +36,36 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
+        val retrofitBuilder = Retrofit.Builder()
+            .baseUrl("https://deezerdevs-deezer.p.rapidapi.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(MusicApi::class.java)
+
+        val retrofitData = retrofitBuilder.getData("eminem")
+
+        retrofitData.enqueue( object : Callback<MyData?> {
+            override fun onResponse(p0: Call<MyData?>, p1: Response<MyData?>) {
+                val dataList = p1.body()?.data
+
+                if (dataList != null) {
+                    musicAdapter.adapter = OnlineMusicAdapter(this@MainActivity, dataList)
+                    musicAdapter.setHasFixedSize(true)
+                    musicAdapter.layoutManager = LinearLayoutManager(this@MainActivity)
+                    Log.d("TAG: onResponse", "onResponse: ${p1.body()}")
+                } else {
+                    Log.e("TAG: onFailure", "onFailure")
+                }
+            }
+
+
+            override fun onFailure(p0: Call<MyData?>, p1: Throwable) {
+                Log.d("TAG: onFailure", "onFailure" + p1.message)
+            }
+
+        })
+
+
         musicAdapter = findViewById(R.id.MusicRecycler)
         songsButton = findViewById(R.id.SongsBtn)
         artistsButton = findViewById(R.id.ArtistsBtn)
@@ -42,8 +77,6 @@ class MainActivity : AppCompatActivity() {
         shuffle = findViewById(R.id.shuffleBtn)
         playAll = findViewById(R.id.playAllBtn)
 
-        adapterSetup()
-
         buttonActions()
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -51,12 +84,6 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-    }
-
-    private fun adapterSetup() {
-        musicAdapter.adapter = OnlineMusicAdapter(this)
-        musicAdapter.setHasFixedSize(true)
-        musicAdapter.layoutManager = LinearLayoutManager(this)
     }
 
 
